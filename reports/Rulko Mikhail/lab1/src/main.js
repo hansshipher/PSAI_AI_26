@@ -6,7 +6,7 @@ const dataset = [
 ];
 
 class Adaline {
-    constructor(learning_rate = 0.01) { // Для ADALINE лучше брать LR поменьше (напр. 0.01)
+    constructor(learning_rate = 0.8) { // Для ADALINE лучше брать LR поменьше (напр. 0.01)
         this.w1 = Math.random() * 0.2 - 0.1;
         this.w2 = Math.random() * 0.2 - 0.1;
         this.bias = Math.random() * 0.2 - 0.1;
@@ -58,11 +58,13 @@ class Visualizer {
     }
 
     drawMSE(history) {
-        if (!this.mseCtx) return;
+        if (!this.mseCtx || history.length === 0) return;
         const ctx = this.mseCtx;
         const w = this.mseCanvas.width;
         const h = this.mseCanvas.height;
         ctx.clearRect(0, 0, w, h);
+
+        const maxMse = Math.max(...history);
 
         ctx.beginPath();
         ctx.strokeStyle = '#2ecc71';
@@ -70,7 +72,9 @@ class Visualizer {
 
         history.forEach((mse, i) => {
             const x = (i / (history.length - 1)) * w;
-            const y = h - (mse * h);
+
+            const y = h - (mse / maxMse) * (h - 20) - 10; 
+            
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
         });
@@ -123,7 +127,7 @@ class Visualizer {
     }
 }
 
-const brain = new Adaline(0.1);
+const brain = new Adaline(0.001); // Начни с этого
 const viz = new Visualizer('mseChart', 'decisionChart');
 let mseHistory = [];
 
