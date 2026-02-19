@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -31,20 +30,19 @@ class LinearBinaryClassifier:
         history = []
 
         for epoch in range(epochs):
-            errors = 0
+            squared_error_sum = 0
 
             for xi, target in zip(Xb, y):
-                output = np.dot(xi, self.w)          # линейный выход
-                delta = target - output             # ошибка (дельта)
-                self.w += self.lr * delta * xi      # дельта-правило
+                output = np.dot(xi, self.w)
+                delta = target - output
+                self.w += self.lr * delta * xi
 
-                predicted_class = 1 if output >= 0 else 0
-                if predicted_class != target:
-                    errors += 1
+                squared_error_sum += delta ** 2
 
-            history.append(errors)
+            mse = squared_error_sum / len(y)
+            history.append(mse)
 
-            if errors == 0:
+            if mse < 1e-6:
                 break
 
         return history
@@ -60,19 +58,15 @@ X_data = np.array([
 
 y_data = np.array([1, 1, 0, 0])
 
-
-# Обучение
 classifier = LinearBinaryClassifier(features_count=2, lr=0.01)
 loss_curve = classifier.train(X_data, y_data)
 
-
-# Визуализация
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 axes[0].plot(loss_curve)
-axes[0].set_title("Количество ошибок")
+axes[0].set_title("Среднеквадратичная ошибка (MSE)")
 axes[0].set_xlabel("Эпоха")
-axes[0].set_ylabel("Ошибки")
+axes[0].set_ylabel("MSE")
 axes[0].grid()
 
 xmin, xmax = -6, 6
@@ -92,9 +86,10 @@ axes[1].contour(grid_x, grid_y, grid_pred, levels=[0.5])
 colors = ['red' if label == 0 else 'blue' for label in y_data]
 axes[1].scatter(X_data[:, 0], X_data[:, 1], c=colors, edgecolors='black')
 
+# Линия разделения
 if abs(classifier.w[2]) > 1e-6:
     x_line = np.linspace(xmin, xmax, 200)
-    y_line = -(classifier.w[0] + classifier.w[1]*x_line) / classifier.w[2]
+    y_line = -(classifier.w[0] + classifier.w[1] * x_line) / classifier.w[2]
     axes[1].plot(x_line, y_line)
 
 axes[1].set_xlim(xmin, xmax)
@@ -122,4 +117,3 @@ while True:
         print(f"Класс точки: {prediction}")
     except:
         print("Ошибка ввода. Введите два числа через пробел.")
-
