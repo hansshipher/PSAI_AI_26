@@ -179,3 +179,4 @@ while True:
         plot_both_boundaries(X, T, w_fixed, w_adapt, show_point=(x1u, x2u, y_bin_ad))
     except ValueError:
         print("Ошибка: введите корректные числа.")
+
